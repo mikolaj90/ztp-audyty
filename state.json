@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "baseline_at": "2026-08-02",
+  "projects": {
+    "https://ztp.krakow.pl/rower/audyty/audyt/przebudowa-prawoskretu-z-al-slowackiego-w-ul-pradnicka": {
+      "title": "Przebudowa prawoskrętu z al. Słowackiego w ul. Prądnicką",
+      "location": "al. Słowackiego / ul. Prądnicka",
+      "notified_at": "2026-08-02",
+      "opinion_documents": [],
+      "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/rozbudowa-drogi-wewnetrznej-ul-bagrowej": {
+      "title": "Rozbudowa drogi wewnętrznej ul. Bagrowej",
+      "location": "ul. Bagrowa",
+      "notified_at": "2026-08-02",
+      "opinion_documents": [],
+      "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/budowa-zjazdu-z-ul-jana-xxiii-w-krakowie": {
+      "title": "Budowa zjazdu z ul. Jana XXIII w Krakowie",
+      "location": "ul. Jana XXIII",
+      "notified_at": "2026-08-02",
+      "opinion_documents": [],
+      "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/koncepcja-rozbudowy-ulicy-kocmyrzowskiej-w-krakowie-wraz-z-niezbedna-infrastruktura-techniczna-na-odcinku-od-skrzyzowania-z-ulica-bulwarowa-do-wezla-grebalow": {
+      "title": "Koncepcja rozbudowy ulicy Kocmyrzowskiej w Krakowie wraz z niezbędną infrastrukturą techniczną na odcinku od skrzyżowania z ulicą Bulwarową do węzła Grębałów",
+      "location": "ul. Kocmyrzowska",
+      "notified_at": "2026-08-02",
+      "opinion_documents": [],
+      "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/przebudowa-ul-pasternik-polegajaca-na-budowie-ciagu-pieszo-rowerowego": {
+      "title": "Przebudowa ul. Pasternik polegająca na budowie ciągu pieszo-rowerowego",
+      "location": "ul. Pasternik",
+      "notified_at": "2026-08-02",
+      "opinion_documents": [],
+      "post_audit_documents": []
+    }
+  }
+}
+
