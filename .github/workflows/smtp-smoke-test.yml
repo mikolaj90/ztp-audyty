@@ -1,0 +1,70 @@
+name: Jednorazowy test poczty
+
+on:
+  push:
+    paths:
+      - ".github/workflows/smtp-smoke-test.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  send-test-email:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Wyślij wiadomość testową
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_APP_PASSWORD: ${{ secrets.SMTP_APP_PASSWORD }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: |
+          python - <<'PY'
+          import os
+          import smtplib
+          import ssl
+          from email.message import EmailMessage
+
+          user = os.environ.get("SMTP_USER", "").strip()
+          password = os.environ.get("SMTP_APP_PASSWORD", "").replace(" ", "")
+          recipient = os.environ.get("MAIL_TO", "").strip()
+
+          missing = [
+              name for name, value in (
+                  ("SMTP_USER", user),
+                  ("SMTP_APP_PASSWORD", password),
+                  ("MAIL_TO", recipient),
+              )
+              if not value
+          ]
+          if missing:
+              raise SystemExit("Brakuje sekretów: " + ", ".join(missing))
+
+          message = EmailMessage()
+          message["Subject"] = "TEST – Audyty rowerowe ZTP"
+          message["From"] = f"Audyty rowerowe ZTP <{user}>"
+          message["To"] = recipient
+          message.set_content(
+              "Test zakończony powodzeniem. GitHub Actions może wysyłać "
+              "powiadomienia z monitora Audytów rowerowych ZTP."
+          )
+          message.add_alternative(
+              "<html><body style='font-family:Arial,sans-serif;line-height:1.5'>"
+              "<p><b>Test zakończony powodzeniem.</b></p>"
+              "<p>GitHub Actions może wysyłać powiadomienia z monitora "
+              "Audytów rowerowych ZTP.</p>"
+              "</body></html>",
+              subtype="html",
+          )
+
+          with smtplib.SMTP_SSL(
+              "smtp.gmail.com",
+              465,
+              context=ssl.create_default_context(),
+              timeout=40,
+          ) as smtp:
+              smtp.login(user, password)
+              smtp.send_message(message)
+
+          print("Wiadomość testowa została przekazana do serwera Gmail.")
+          PY
