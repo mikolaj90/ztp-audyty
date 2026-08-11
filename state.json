@@ -36,7 +36,20 @@
       "notified_at": "2026-08-02",
       "opinion_documents": [],
       "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/przebudowa-drogi-publicznej-tj-ul-pradnickiej-w-zakresie-przebudowy-istniejacych-zatok-autobusowych-przystanki-lekarska-01-lekarska-02": {
+      "title": "Przebudowa drogi publicznej, tj. ul. Prądnickiej, w zakresie przebudowy istniejących zatok autobusowych (przystanki Lekarska 01, Lekarska 02)",
+      "location": "Przebudowa drogi publicznej, tj. ul. Prądnickiej, w zakresie przebudowy istniejących zatok",
+      "notified_at": "2026-08-11",
+      "opinion_documents": [],
+      "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/przebudowa-ul-skotnickiej-w-zakresie-realizacji-drogi-dla-pieszych-wraz-z-zatoka-postojowa": {
+      "title": "Przebudowa ul. Skotnickiej w zakresie realizacji drogi dla pieszych wraz z zatoką postojową",
+      "location": "ul. Skotnicka",
+      "notified_at": "2026-08-11",
+      "opinion_documents": [],
+      "post_audit_documents": []
     }
   }
 }
-
