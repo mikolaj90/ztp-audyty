@@ -24,7 +24,22 @@ class MonitorTests(unittest.TestCase):
         self.assertEqual(len(project.plans), 1)
         self.assertEqual(len(project.opinions), 1)
         self.assertEqual(len(project.post_audit_plans), 1)
+        self.assertEqual(project.publication_date, "1.08.2026 12:00")
         self.assertEqual(project.deadline, "15 sierpnia 2026 roku")
+
+    def test_project_metadata_outside_heading_box(self):
+        page = '''<main><div class="page-content">
+        <div class="news-desc"><h2>Przebudowa ul. Testowej</h2>
+        <div class="news-item-date">Opublikowano: 11.08.2026 12:53</div></div>
+        <p>Możliwość składania uwag do 24 sierpnia 2026</p>
+        <div><a href="/files/plan.pdf"><span>pdf-icon</span> Plan sytuacyjny</a></div>
+        </div></main>'''
+        project = parse_project(page, "https://ztp.krakow.pl/rower/audyty/audyt/test", "Przebudowa ul. Testowej", "ul. Testowa")
+        self.assertEqual(project.publication_date, "11.08.2026 12:53")
+        self.assertEqual(project.deadline, "24 sierpnia 2026")
+        self.assertEqual(len(project.plans), 1)
+        self.assertEqual(project.plans[0].label, "Plan sytuacyjny")
+        self.assertEqual(project.plans[0].url, "https://ztp.krakow.pl/files/plan.pdf")
 
 
 if __name__ == "__main__":
