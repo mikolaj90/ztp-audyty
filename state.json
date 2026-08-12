@@ -34,7 +34,9 @@
       "title": "Przebudowa ul. Pasternik polegająca na budowie ciągu pieszo-rowerowego",
       "location": "ul. Pasternik",
       "notified_at": "2026-08-02",
-      "opinion_documents": [],
+      "opinion_documents": [
+        "https://ztp.krakow.pl/wp-content/uploads/2026/04/TA.651.1.31.2026_Pasterniek_-1.pdf"
+      ],
       "post_audit_documents": []
     },
     "https://ztp.krakow.pl/rower/audyty/audyt/przebudowa-drogi-publicznej-tj-ul-pradnickiej-w-zakresie-przebudowy-istniejacych-zatok-autobusowych-przystanki-lekarska-01-lekarska-02": {
@@ -48,6 +50,13 @@
       "title": "Przebudowa ul. Skotnickiej w zakresie realizacji drogi dla pieszych wraz z zatoką postojową",
       "location": "ul. Skotnicka",
       "notified_at": "2026-08-11",
+      "opinion_documents": [],
+      "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/projekt-budowy-drogi-publicznej-ul-siemaszki-zgodnie-z-mpzp-zabiniec-wraz-z-przebudowa-odcinka-ul-pradnickiej": {
+      "title": "Projekt budowy drogi publicznej ul. Siemaszki zgodnie z MPZP “Żabiniec” wraz z przebudową odcinka ul. Prądnickiej",
+      "location": "ul. Siemaszki zgodnie z MPZP “Żabiniec” / ul. Prądnicka",
+      "notified_at": "2026-08-12",
       "opinion_documents": [],
       "post_audit_documents": []
     }
