@@ -111,6 +111,18 @@ def extract_date(text: str) -> str:
     return ""
 
 
+def extract_labeled_date(text: str, label: str, include_time: bool = False) -> str:
+    """Extract a date immediately following a known metadata label."""
+    months = (
+        "stycznia|lutego|marca|kwietnia|maja|czerwca|lipca|sierpnia|"
+        "września|października|listopada|grudnia"
+    )
+    date_value = rf"(?:\d{{1,2}}[./-]\d{{1,2}}[./-]\d{{4}}|\d{{1,2}}\s+(?:{months})\s+\d{{4}})(?:\s+r(?:oku|\.)?)?"
+    time_value = r"(?:\s+\d{1,2}:\d{2})?" if include_time else ""
+    match = re.search(rf"{label}\s*({date_value}{time_value})", text, re.IGNORECASE)
+    return clean(match.group(1)) if match else ""
+
+
 def extract_documents(content: Tag, page_url: str) -> list[Document]:
     documents: list[Document] = []
     buffer: list[str] = []
@@ -133,6 +145,7 @@ def extract_documents(content: Tag, page_url: str) -> list[Document]:
         if not path.endswith(DOC_EXTENSIONS):
             continue
         label = clean(node.get_text(" ", strip=True)) or Path(path).name
+        label = re.sub(r"^(?:pdf|docx?)-icon\s+", "", label, flags=re.IGNORECASE)
         context = clean(" ".join(buffer[-16:]))[-1000:]
         documents.append(Document(url, label, context, extract_date(context)))
         buffer = []
@@ -201,18 +214,23 @@ def parse_project(page_html: str, url: str, list_title: str, location: str) -> P
     if heading is None:
         heading = soup.find("h1") or soup.find("h2")
     title = clean(heading.get_text()) if heading else list_title
-    content = heading.parent if heading and heading.parent else (soup.find("main") or soup.body)
+    # On current ZTP pages the heading sits in a small ``news-desc`` box, while
+    # the deadline and downloads are its siblings inside ``page-content``.
+    # Using heading.parent therefore silently discarded all three fields.
+    content = (
+        heading.find_parent(class_="page-content") if heading else None
+    ) or (heading.find_parent("main") if heading else None) or soup.find("main") or soup.body
     full_text = clean(content.get_text(" ", strip=True))
-    published = re.search(r"Opublikowano:\s*([^\n]+?)(?=\s+(?:Możliwość|Opis|Plan|Pobierz|$))", full_text, re.I)
-    deadline = re.search(r"Możliwość składania uwag do\s+(.+?)(?=\s+(?:Opis|Plan|Pobierz|Przekroje|$))", full_text, re.I)
+    published = extract_labeled_date(full_text, r"Opublikowano:\s*", include_time=True)
+    deadline = extract_labeled_date(full_text, r"Możliwość\s+składania\s+uwag\s+do\s*")
     docs = extract_documents(content, url)
     opinions = [doc for doc in docs if is_opinion(doc)]
     post_plans = [doc for doc in docs if not is_opinion(doc) and is_post_audit_plan(doc)]
     initial_plans = [doc for doc in docs if "plan sytu" in doc.label.lower() and doc not in post_plans]
     return Project(
         url=url, title=title, location=location,
-        publication_date=clean(published.group(1)) if published else "",
-        deadline=clean(deadline.group(1)).rstrip(".") if deadline else "",
+        publication_date=published,
+        deadline=deadline.rstrip("."),
         plans=initial_plans, opinions=opinions, post_audit_plans=post_plans,
     )
 
