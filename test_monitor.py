@@ -1,6 +1,15 @@
 import unittest
+from unittest.mock import Mock
 
-from monitor import infer_location, parse_open_projects, parse_project
+import requests
+
+from monitor import (
+    fetch_optional,
+    infer_location,
+    parse_open_projects,
+    parse_project,
+    reconcile_missing_project_urls,
+)
 
 
 class MonitorTests(unittest.TestCase):
@@ -47,6 +56,53 @@ class MonitorTests(unittest.TestCase):
                 "https://ztp.krakow.pl/files/plan-cz-2.pdf",
             ],
         )
+
+    def test_reconciles_corrected_title_and_url_without_losing_state(self):
+        old_url = "https://ztp.krakow.pl/rower/audyty/audyt/przebudowa-ul-skotnickiej-w-zakresie-realizacji-drogi-dla-pieszych-wraz-z-zatoka-postojowa"
+        new_url = "https://ztp.krakow.pl/rower/audyty/audyt/przebudowa-ul-skotnica-w-zakresie-realizacji-drogi-dla-pieszych-wraz-z-zatoka-postojowa"
+        known = {
+            old_url: {
+                "title": "Przebudowa ul. Skotnickiej w zakresie realizacji drogi dla pieszych wraz z zatoką postojową",
+                "location": "ul. Skotnicka",
+                "notified_at": "2026-08-11",
+                "opinion_documents": ["https://example.com/opinia.pdf"],
+                "post_audit_documents": [],
+            }
+        }
+        title = "Przebudowa ul. Skotnica w zakresie realizacji drogi dla pieszych wraz z zatoką postojową"
+
+        migrations = reconcile_missing_project_urls(known, {old_url}, [(new_url, title)], {})
+
+        self.assertEqual(migrations, [(old_url, new_url)])
+        self.assertNotIn(old_url, known)
+        self.assertEqual(known[new_url]["title"], title)
+        self.assertEqual(known[new_url]["location"], "ul. Skotnica")
+        self.assertEqual(known[new_url]["notified_at"], "2026-08-11")
+        self.assertEqual(known[new_url]["opinion_documents"], ["https://example.com/opinia.pdf"])
+
+    def test_does_not_reconcile_unrelated_project(self):
+        old_url = "https://ztp.krakow.pl/rower/audyty/audyt/stary"
+        new_url = "https://ztp.krakow.pl/rower/audyty/audyt/nowy"
+        known = {old_url: {"title": "Przebudowa ul. Starej", "location": "ul. Stara"}}
+
+        migrations = reconcile_missing_project_urls(
+            known,
+            {old_url},
+            [(new_url, "Budowa kładki nad Wisłą")],
+            {},
+        )
+
+        self.assertEqual(migrations, [])
+        self.assertIn(old_url, known)
+        self.assertNotIn(new_url, known)
+
+    def test_single_404_is_skipped(self):
+        response = Mock(status_code=404)
+        response.raise_for_status.side_effect = requests.HTTPError(response=response)
+        session = Mock()
+        session.get.return_value = response
+
+        self.assertIsNone(fetch_optional(session, "https://ztp.krakow.pl/missing"))
 
 
 if __name__ == "__main__":

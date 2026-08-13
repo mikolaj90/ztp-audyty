@@ -10,8 +10,10 @@ import os
 import re
 import smtplib
 import ssl
+import unicodedata
 from dataclasses import dataclass, field
 from datetime import date
+from difflib import SequenceMatcher
 from email.message import EmailMessage
 from pathlib import Path
 from typing import Iterable
@@ -72,6 +74,17 @@ def fetch(session: requests.Session, url: str) -> str:
     if "html" not in response.headers.get("content-type", "").lower():
         raise MonitorError(f"ZTP zwrócił nieoczekiwany format dla {url}")
     return response.text
+
+
+def fetch_optional(session: requests.Session, url: str) -> str | None:
+    """Return None for a removed ZTP page without aborting the whole monitor."""
+    try:
+        return fetch(session, url)
+    except requests.HTTPError as error:
+        if error.response is not None and error.response.status_code == 404:
+            print(f"OSTRZEŻENIE: ZTP zwrócił 404 dla {url}; pomijam tę podstronę.")
+            return None
+        raise
 
 
 def parse_open_projects(page_html: str) -> list[tuple[str, str]]:
@@ -208,6 +221,54 @@ def infer_location(title: str, url: str, overrides: dict[str, str]) -> str:
     return clean(title)[:90]
 
 
+def normalized_title(title: str) -> str:
+    value = unicodedata.normalize("NFKD", title.lower())
+    value = "".join(character for character in value if not unicodedata.combining(character))
+    return clean(re.sub(r"[^a-z0-9]+", " ", value))
+
+
+def reconcile_missing_project_urls(
+    known: dict[str, dict],
+    missing_urls: set[str],
+    open_items: list[tuple[str, str]],
+    overrides: dict[str, str],
+) -> list[tuple[str, str]]:
+    """Migrate a removed URL when ZTP exposes the same, nearly identical audit under a new one."""
+    available = [(url, title) for url, title in open_items if url not in known]
+    migrations: list[tuple[str, str]] = []
+    used_old_urls: set[str] = set()
+
+    for new_url, new_title in available:
+        ranked = sorted(
+            (
+                SequenceMatcher(
+                    None,
+                    normalized_title(known[old_url].get("title", "")),
+                    normalized_title(new_title),
+                ).ratio(),
+                old_url,
+            )
+            for old_url in missing_urls
+            if old_url in known and old_url not in used_old_urls
+        )
+        if not ranked:
+            continue
+        best_score, old_url = ranked[-1]
+        second_score = ranked[-2][0] if len(ranked) > 1 else 0.0
+        if best_score < 0.95 or best_score - second_score < 0.03:
+            continue
+
+        saved = known.pop(old_url)
+        saved["title"] = new_title
+        saved["location"] = infer_location(new_title, new_url, overrides)
+        known[new_url] = saved
+        used_old_urls.add(old_url)
+        migrations.append((old_url, new_url))
+        print(f"ZMIANA ADRESU: {old_url} -> {new_url}")
+
+    return migrations
+
+
 def parse_project(page_html: str, url: str, list_title: str, location: str) -> Project:
     soup = BeautifulSoup(page_html, "html.parser")
     heading = next((h for h in soup.find_all(["h1", "h2"]) if clean(h.get_text()) == list_title), None)
@@ -291,16 +352,31 @@ def run(check_only: bool = False) -> bool:
         raise MonitorError("Sekcja „Otwarte” nie zawiera projektów; przerywam, aby nie zapisać błędnego stanu.")
 
     known = state["projects"]
+    tracked_projects: list[Project] = []
+    missing_urls: set[str] = set()
+    for url, saved in list(known.items()):
+        page_html = fetch_optional(session, url)
+        if page_html is None:
+            missing_urls.add(url)
+            continue
+        tracked_projects.append(parse_project(page_html, url, saved["title"], saved["location"]))
+
+    migrations = reconcile_missing_project_urls(known, missing_urls, open_items, overrides)
+    for _old_url, new_url in migrations:
+        saved = known[new_url]
+        page_html = fetch_optional(session, new_url)
+        if page_html is not None:
+            tracked_projects.append(parse_project(page_html, new_url, saved["title"], saved["location"]))
+
     new_projects: list[Project] = []
     for url, title in open_items:
         if url in known:
             continue
+        page_html = fetch_optional(session, url)
+        if page_html is None:
+            continue
         location = infer_location(title, url, overrides)
-        new_projects.append(parse_project(fetch(session, url), url, title, location))
-
-    tracked_projects: list[Project] = []
-    for url, saved in known.items():
-        tracked_projects.append(parse_project(fetch(session, url), url, saved["title"], saved["location"]))
+        new_projects.append(parse_project(page_html, url, title, location))
 
     opinion_events: list[tuple[Project, list[Document]]] = []
     post_events: list[tuple[Project, list[Document]]] = []
@@ -315,6 +391,8 @@ def run(check_only: bool = False) -> bool:
 
     print(f"Otwarte: {len(open_items)}, nowe: {len(new_projects)}, nowe opinie: {len(opinion_events)}, projekty po audycie: {len(post_events)}")
     if check_only:
+        for old_url, new_url in migrations:
+            print(f"NOWY ADRES: {old_url} -> {new_url}")
         for project in new_projects:
             print(f"NOWY: {project.location} — {project.title}")
         for project, docs in opinion_events:
@@ -344,7 +422,7 @@ def run(check_only: bool = False) -> bool:
             f"<b>Plan sytuacyjny po audycie:</b><br>{links}</p>",
         )
 
-    changed = bool(new_projects or opinion_events or post_events)
+    changed = bool(migrations or new_projects or opinion_events or post_events)
     if not changed:
         return False
     today = date.today().isoformat()
