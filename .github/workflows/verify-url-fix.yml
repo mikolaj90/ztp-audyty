@@ -1,0 +1,28 @@
+name: Jednorazowa weryfikacja zmiany adresu ZTP
+
+on:
+  push:
+    paths:
+      - ".github/workflows/verify-url-fix.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Pobierz repozytorium
+        uses: actions/checkout@v4
+      - name: Przygotuj Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Zainstaluj zależności
+        run: pip install -r requirements.txt
+      - name: Uruchom testy
+        run: python -m unittest -v
+      - name: Sprawdź aktualną stronę ZTP bez wysyłki
+        run: python monitor.py --check
