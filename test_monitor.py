@@ -6,6 +6,7 @@ import requests
 from monitor import (
     fetch_optional,
     infer_location,
+    parse_recipients,
     parse_open_projects,
     parse_project,
     reconcile_missing_project_urls,
@@ -13,6 +14,15 @@ from monitor import (
 
 
 class MonitorTests(unittest.TestCase):
+    def test_recipient_lists_are_combined_and_deduplicated(self):
+        self.assertEqual(
+            parse_recipients(
+                "miki@example.com",
+                "kamil@example.com; miki@example.com\ntrzeci@example.com",
+            ),
+            ["miki@example.com", "kamil@example.com", "trzeci@example.com"],
+        )
+
     def test_open_section_stops_at_closed(self):
         page = '''<h3>Otwarte</h3><ul><li><a href="/rower/audyty/audyt/nowy">Nowy</a></li></ul>
                   <h3>Zamknięte</h3><a href="/rower/audyty/audyt/stary">Stary</a>'''

@@ -37,6 +37,7 @@ jobs:
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_APP_PASSWORD: ${{ secrets.SMTP_APP_PASSWORD }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
+          MAIL_TO_EXTRA: ${{ secrets.MAIL_TO_EXTRA }}
         run: python monitor.py
 
       - name: Zapisz stan tylko po wysłaniu powiadomienia
@@ -50,4 +51,3 @@ jobs:
           git add state.json
           git commit -m "Aktualizuj stan powiadomień"
           git push
-

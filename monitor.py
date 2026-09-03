@@ -315,21 +315,39 @@ def project_block(project: Project) -> str:
     )
 
 
+def parse_recipients(*values: str) -> list[str]:
+    """Parse one or more comma/semicolon/newline-separated recipient lists."""
+    recipients: list[str] = []
+    for value in values:
+        for recipient in re.split(r"[,;\n]+", value or ""):
+            recipient = recipient.strip()
+            if recipient and recipient not in recipients:
+                recipients.append(recipient)
+    return recipients
+
+
 def send_mail(subject: str, body_html: str) -> None:
     smtp_user = os.environ.get("SMTP_USER", "").strip()
     smtp_password = os.environ.get("SMTP_APP_PASSWORD", "").replace(" ", "")
-    recipient = os.environ.get("MAIL_TO", "").strip()
-    if not all((smtp_user, smtp_password, recipient)):
-        raise MonitorError("Brakuje sekretu SMTP_USER, SMTP_APP_PASSWORD lub MAIL_TO.")
-    message = EmailMessage()
-    message["Subject"] = subject
-    message["From"] = f"Audyty rowerowe ZTP <{smtp_user}>"
-    message["To"] = recipient
-    message.set_content(re.sub(r"<[^>]+>", " ", body_html))
-    message.add_alternative(f"<html><body style='font-family:Arial,sans-serif;line-height:1.5'>{body_html}</body></html>", subtype="html")
+    recipients = parse_recipients(
+        os.environ.get("MAIL_TO", ""),
+        os.environ.get("MAIL_TO_EXTRA", ""),
+    )
+    if not smtp_user or not smtp_password or not recipients:
+        raise MonitorError("Brakuje sekretu SMTP_USER, SMTP_APP_PASSWORD lub odbiorcy MAIL_TO.")
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ssl.create_default_context(), timeout=40) as smtp:
         smtp.login(smtp_user, smtp_password)
-        smtp.send_message(message)
+        for recipient in recipients:
+            message = EmailMessage()
+            message["Subject"] = subject
+            message["From"] = f"Audyty rowerowe ZTP <{smtp_user}>"
+            message["To"] = recipient
+            message.set_content(re.sub(r"<[^>]+>", " ", body_html))
+            message.add_alternative(
+                f"<html><body style='font-family:Arial,sans-serif;line-height:1.5'>{body_html}</body></html>",
+                subtype="html",
+            )
+            smtp.send_message(message)
 
 
 def load_json(path: Path) -> dict:
