@@ -1,0 +1,53 @@
+name: Jednorazowy test dodatkowego odbiorcy
+
+on:
+  push:
+    paths:
+      - ".github/workflows/test-mail-to-extra.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  send-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Wyślij wiadomość testową do dodatkowego odbiorcy
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_APP_PASSWORD: ${{ secrets.SMTP_APP_PASSWORD }}
+          MAIL_TO_EXTRA: ${{ secrets.MAIL_TO_EXTRA }}
+        run: |
+          python - <<'PY'
+          import os
+          import smtplib
+          import ssl
+          from email.message import EmailMessage
+
+          smtp_user = os.environ.get("SMTP_USER", "").strip()
+          smtp_password = os.environ.get("SMTP_APP_PASSWORD", "").replace(" ", "")
+          recipient = os.environ.get("MAIL_TO_EXTRA", "").strip()
+          if not smtp_user or not smtp_password or not recipient:
+              raise RuntimeError("Brakuje SMTP_USER, SMTP_APP_PASSWORD lub MAIL_TO_EXTRA.")
+
+          message = EmailMessage()
+          message["Subject"] = "TEST – Audyty rowerowe ZTP"
+          message["From"] = f"Audyty rowerowe ZTP <{smtp_user}>"
+          message["To"] = recipient
+          message.set_content(
+              "To wiadomość testowa. Adres został poprawnie dodany do powiadomień "
+              "o audytach rowerowych ZTP."
+          )
+
+          with smtplib.SMTP_SSL(
+              "smtp.gmail.com",
+              465,
+              context=ssl.create_default_context(),
+              timeout=40,
+          ) as smtp:
+              smtp.login(smtp_user, smtp_password)
+              smtp.send_message(message)
+
+          print("Gmail przyjął wiadomość testową do dodatkowego odbiorcy.")
+          PY
