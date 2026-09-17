@@ -143,6 +143,20 @@
       "notified_at": "2026-09-09",
       "opinion_documents": [],
       "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/budowa-drogi-w-terenie-oznaczonym-w-mpzp-symbolem-8-kdd-od-dzialki-nr-47-1-obr-25-podgorze-do-dzialki-nr-155-obr-25-podgorze": {
+      "title": "Budowa drogi w terenie oznaczonym w MPZP symbolem 8 KDD od działki nr 47/1 obr. 25 Podgórze do działki nr 155 obr. 25 Podgórze",
+      "location": "Budowa drogi w terenie oznaczonym w MPZP symbolem 8 KDD od działki nr 47/1 obr. 25 Podgórz",
+      "notified_at": "2026-09-17",
+      "opinion_documents": [],
+      "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/przebudowa-al-mickiewicza-w-ramach-zadania-stare-miasto-zrywa-z-betonem": {
+      "title": "Przebudowa al. Mickiewicza w ramach zadania Stare Miasto zrywa z betonem",
+      "location": "al. Mickiewicza w ramach zadania Stare Miasto zrywa z betonem",
+      "notified_at": "2026-09-17",
+      "opinion_documents": [],
+      "post_audit_documents": []
     }
   }
 }
