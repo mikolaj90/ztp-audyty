@@ -4,6 +4,7 @@ from unittest.mock import Mock
 import requests
 
 from monitor import (
+    MonitorError,
     fetch_optional,
     infer_location,
     parse_recipients,
@@ -27,6 +28,16 @@ class MonitorTests(unittest.TestCase):
         page = '''<h3>Otwarte</h3><ul><li><a href="/rower/audyty/audyt/nowy">Nowy</a></li></ul>
                   <h3>Zamknięte</h3><a href="/rower/audyty/audyt/stary">Stary</a>'''
         self.assertEqual(parse_open_projects(page), [("https://ztp.krakow.pl/rower/audyty/audyt/nowy", "Nowy")])
+
+    def test_empty_open_section_is_valid(self):
+        page = '''<h3>Otwarte</h3><h3>Zamknięte</h3>
+                  <a href="/rower/audyty/audyt/stary">Stary</a>'''
+        self.assertEqual(parse_open_projects(page), [])
+
+    def test_missing_closed_section_fails(self):
+        page = '<h3>Otwarte</h3><a href="/rower/audyty/audyt/nowy">Nowy</a>'
+        with self.assertRaises(MonitorError):
+            parse_open_projects(page)
 
     def test_location_nominative(self):
         self.assertEqual(infer_location("Przebudowa ul. Przemysłowej w Krakowie", "x", {}), "ul. Przemysłowa")

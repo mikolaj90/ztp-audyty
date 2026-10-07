@@ -97,9 +97,11 @@ def parse_open_projects(page_html: str) -> list[tuple[str, str]]:
         raise MonitorError("Nie znaleziono sekcji „Otwarte” – ZTP mogło zmienić układ strony.")
 
     results: list[tuple[str, str]] = []
+    closed_heading_found = False
     for element in heading.find_all_next():
         if element is not heading and element.name and re.fullmatch(r"h[1-6]", element.name):
             if clean(element.get_text()).lower() == "zamknięte":
+                closed_heading_found = True
                 break
         if element.name != "a" or not element.get("href"):
             continue
@@ -109,6 +111,9 @@ def parse_open_projects(page_html: str) -> list[tuple[str, str]]:
         item = (url, clean(element.get_text()))
         if item not in results:
             results.append(item)
+
+    if not closed_heading_found:
+        raise MonitorError("Nie znaleziono sekcji „Zamknięte” – ZTP mogło zmienić układ strony.")
     return results
 
 
@@ -366,8 +371,6 @@ def run(check_only: bool = False) -> bool:
     session.headers["User-Agent"] = "ztp-audyty-monitor/1.0 (+https://github.com/mikolaj90/ztp-audyty)"
 
     open_items = parse_open_projects(fetch(session, LIST_URL))
-    if not open_items:
-        raise MonitorError("Sekcja „Otwarte” nie zawiera projektów; przerywam, aby nie zapisać błędnego stanu.")
 
     known = state["projects"]
     tracked_projects: list[Project] = []
