@@ -157,6 +157,13 @@
       "notified_at": "2026-09-17",
       "opinion_documents": [],
       "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/przebudowa-zatoki-autobusowej-przystanku-mackiewicza-02-w-ciagu-ul-opolskiej": {
+      "title": "Przebudowa zatoki autobusowej przystanku Mackiewicza 02 w ciągu ul. Opolskiej",
+      "location": "ul. Opolska",
+      "notified_at": "2026-10-09",
+      "opinion_documents": [],
+      "post_audit_documents": []
     }
   }
 }
