@@ -185,6 +185,20 @@
       "notified_at": "2026-11-02",
       "opinion_documents": [],
       "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/przebudowa-ul-dzialowskiego-w-zakresie-budowy-chodnika": {
+      "title": "Przebudowa ul. Działowskiego w zakresie budowy chodnika",
+      "location": "ul. Działowskiego",
+      "notified_at": "2026-11-05",
+      "opinion_documents": [],
+      "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/przebudowa-ul-podgorki-tynieckie-polegajaca-na-budowie-chodnika-wraz-z-wyniesionym-przejsciem-dla-pieszych": {
+      "title": "Przebudowa ul. Podgórki Tynieckie polegająca na budowie chodnika wraz z wyniesionym przejściem dla pieszych",
+      "location": "ul. Podgórki Tynieckie",
+      "notified_at": "2026-11-05",
+      "opinion_documents": [],
+      "post_audit_documents": []
     }
   }
 }
