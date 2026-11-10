@@ -199,6 +199,15 @@
       "notified_at": "2026-11-05",
       "opinion_documents": [],
       "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/modernizacja-przejscia-podziemnego-pod-ul-wlotowa-w-ciagu-ul-prostej": {
+      "title": "Koncepcja wielowariantowa modernizacji przejścia podziemnego na skrzyżowaniu ul. Wielickej, ul. Wlotowej i ul. Prostej",
+      "location": "ul. Wlotowa / ul. Prosta",
+      "notified_at": "2026-11-10",
+      "opinion_documents": [
+        "https://ztp.krakow.pl/wp-content/uploads/2025/10/TA.651.1.116.2025__Audyt_Wlotowa_przejscie_podziemne_MJ.pdf"
+      ],
+      "post_audit_documents": []
     }
   }
 }
