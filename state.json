@@ -222,6 +222,27 @@
       "notified_at": "2026-11-14",
       "opinion_documents": [],
       "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/przebudowa-ukladu-drogowego-ul-benedyktynskiej-od-ul-dziewiarzy-do-ul-boleslawa-smialego": {
+      "title": "Przebudowa układu drogowego ul. Benedyktyńskiej – od ul. Dziewiarzy do ul. Bolesława Śmiałego",
+      "location": "ul. Benedyktyńska / ul. Dziewiarzy",
+      "notified_at": "2026-11-16",
+      "opinion_documents": [],
+      "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/budowa-przystanku-autobusowego-w-ciagu-ul-gromadzkiej-w-rejonie-budynku-nr-71": {
+      "title": "Budowa przystanku autobusowego w ciągu ul. Gromadzkiej w rejonie budynku nr 71",
+      "location": "ul. Gromadzkiej w rejonie budynku nr 71",
+      "notified_at": "2026-11-16",
+      "opinion_documents": [],
+      "post_audit_documents": []
+    },
+    "https://ztp.krakow.pl/rower/audyty/audyt/rozbudowa-ul-lindego-wraz-z-rozbiorka-i-budowa-sieci-uzbrojenia-terenu": {
+      "title": "Rozbudowa ul. Lindego wraz z rozbiórką i budową sieci uzbrojenia terenu",
+      "location": "ul. Lindego",
+      "notified_at": "2026-11-16",
+      "opinion_documents": [],
+      "post_audit_documents": []
     }
   }
 }
